@@ -7,18 +7,21 @@ import {
   Image,
   Button
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { addCart } from "../store/actions/cart";
 
 import Colors from "../constants/Colors";
 
 const Detail = ({ navigation }) => {
   const item = navigation.getParam("item");
+  const dispatch = useDispatch();
 
   return (
     <ScrollView>
       <Image style={styles.img} source={{ uri: item.imageUrl }} />
       <Button
         title="ADD To Cart"
-        onPress={() => navigation.navigate("Cart")}
+        onPress={() => dispatch(addCart(item))}
         color={Colors.primary}
       />
       <View style={styles.text}>

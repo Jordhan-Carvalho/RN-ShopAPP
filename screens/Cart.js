@@ -1,24 +1,37 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import { useDispatch } from "react-redux";
+
+import { addOrder } from "../store/actions/orders";
+import CartItem from "../components/CartItem";
+import Card from "../components/Card";
+import Colors from "../constants/Colors";
 
 const Cart = ({ navigation }) => {
   const itemsCart = useSelector(state => state.cartReducer.cart);
+  const totalSum = useSelector(state => state.cartReducer.totalAmount);
 
-  if (itemsCart.length === 0 || !itemsCart) {
-    return (
-      <View style={styles.container}>
-        <Text>No items on cart</Text>
-      </View>
-    );
-  }
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.container}>
-      <Text>Total sum:</Text>
-      {itemsCart.map((item, i) => (
-        <Text key={i}>{item.price}</Text>
-      ))}
+      <Card style={styles.summaryContainer}>
+        <Text style={styles.summaryText}>
+          Total: <Text style={styles.amount}>${totalSum.toFixed(2)}</Text>
+        </Text>
+        <Button
+          title="Order Now"
+          color={Colors.secondary}
+          disabled={itemsCart.length === 0}
+          onPress={() => dispatch(addOrder(itemsCart, totalSum))}
+        />
+      </Card>
+      <FlatList
+        keyExtractor={item => item.id}
+        data={itemsCart}
+        renderItem={itemData => <CartItem product={itemData.item} deletable />}
+      />
     </View>
   );
 };
@@ -29,9 +42,20 @@ Cart.navigationOptions = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    margin: 20
+  },
+  summaryContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start"
+    justifyContent: "space-between",
+    margin: 20,
+    padding: 10
+  },
+  summaryText: {
+    fontSize: 18
+  },
+  amount: {
+    color: Colors.primary
   }
 });
 

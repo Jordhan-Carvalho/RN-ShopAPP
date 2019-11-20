@@ -9,6 +9,10 @@ const EditProducts = () => {
   );
 };
 
+EditProducts.navigationOptions = {
+  headerTitle: "Edit product"
+};
+
 const styles = StyleSheet.create({});
 
 export default EditProducts;

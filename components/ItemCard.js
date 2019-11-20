@@ -1,28 +1,17 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Button,
   Image,
   TouchableOpacity,
   TouchableNativeFeedback,
   Platform
 } from "react-native";
-import { useDispatch } from "react-redux";
 
-import { addCart } from "../store/actions/cart";
 import Card from "./Card";
-import Colors from "../constants/Colors";
 
-const ItemCard = ({ navigation, itemInfo }) => {
-  const dispatch = useDispatch();
-
-  const addToCart = useCallback(() => {
-    dispatch(addCart(itemInfo));
-    navigation.navigate("Cart");
-  }, [dispatch, itemInfo]);
-
+const ItemCard = ({ itemInfo, onSelect, children }) => {
   let TouchButton = TouchableOpacity;
   if (Platform.OS === "android" && Platform.Version >= 21) {
     TouchButton = TouchableNativeFeedback;
@@ -33,7 +22,7 @@ const ItemCard = ({ navigation, itemInfo }) => {
       <TouchButton
         // Effect on the photo
         useForeground
-        onPress={() => navigation.navigate("Detail", { item: itemInfo })}
+        onPress={onSelect}
       >
         <View style={styles.imgContainer}>
           <Image
@@ -46,15 +35,7 @@ const ItemCard = ({ navigation, itemInfo }) => {
       </TouchButton>
       <View style={styles.cardContentContainer}>
         <Text style={{ textAlign: "center" }}>{itemInfo.title}</Text>
-        <View style={styles.cardContent}>
-          <Button
-            title="Detail"
-            color={Colors.primary}
-            onPress={() => navigation.navigate("Detail", { item: itemInfo })}
-          />
-          <Text style={{ color: "grey" }}>R$ {itemInfo.price.toFixed(2)}</Text>
-          <Button title="Cart" color={Colors.primary} onPress={addToCart} />
-        </View>
+        <View style={styles.cardContent}>{children}</View>
       </View>
     </Card>
   );
