@@ -35,15 +35,18 @@ const ItemCard = ({ itemInfo, onSelect, children }) => {
       </TouchButton>
       <View style={styles.cardContentContainer}>
         <Text style={{ textAlign: "center" }}>{itemInfo.title}</Text>
-        <View style={styles.cardContent}>{children}</View>
+        <Text style={{ color: "grey", textAlign: "center" }}>
+          R$ {itemInfo.price.toFixed(2)}
+        </Text>
       </View>
+      <View style={styles.cardContent}>{children}</View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   cardContainer: {
-    height: 250,
+    height: 300,
     margin: 20
   },
   image: {
@@ -54,10 +57,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 10
+    paddingHorizontal: 20
   },
   cardContentContainer: {
-    height: "30%",
+    alignItems: "center",
     padding: 10
   },
   imgContainer: {

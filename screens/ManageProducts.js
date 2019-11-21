@@ -1,15 +1,27 @@
 import React from "react";
-import { StyleSheet, FlatList, Platform, Button, Text } from "react-native";
+import { StyleSheet, FlatList, Platform, Button, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
 import CustomHeaderButton from "../components/CustomHeaderButton";
 import ItemCard from "../components/ItemCard";
 import Colors from "../constants/Colors";
+import { deleteItem } from "../store/actions/items";
 
 const ManageProducts = ({ navigation }) => {
   const userProducts = useSelector(state => state.itemsReducer.userProducts);
   const dispatch = useDispatch();
+
+  const deleteHanlder = id => {
+    Alert.alert("Are you sure?", "Deleting can not be reversed", [
+      {
+        text: "Yes",
+        onPress: () => dispatch(deleteItem(id)),
+        style: "destructive"
+      },
+      { text: "No", style: "cancel" }
+    ]);
+  };
 
   return (
     <FlatList
@@ -19,13 +31,22 @@ const ManageProducts = ({ navigation }) => {
         <ItemCard
           navigation={navigation}
           itemInfo={itemData.item}
-          onSelect={() => {}}
+          onSelect={() =>
+            navigation.navigate("EditProduct", { prod: itemData.item })
+          }
         >
-          <Button title="Edit" color={Colors.primary} onPress={() => {}} />
-          <Text style={{ color: "grey" }}>
-            R$ {itemData.item.price.toFixed(2)}
-          </Text>
-          <Button title="Delete" color={Colors.primary} onPress={() => {}} />
+          <Button
+            title="Edit"
+            color={Colors.primary}
+            onPress={() =>
+              navigation.navigate("EditProduct", { prod: itemData.item })
+            }
+          />
+          <Button
+            title="Delete"
+            color={Colors.primary}
+            onPress={() => deleteHanlder(itemData.item.id)}
+          />
         </ItemCard>
       )}
     />

@@ -24,9 +24,6 @@ const MainScreen = ({ navigation }) => {
           color={Colors.primary}
           onPress={() => navigation.navigate("Detail", { item: itemData.item })}
         />
-        <Text style={{ color: "grey" }}>
-          R$ {itemData.item.price.toFixed(2)}
-        </Text>
         <Button
           title="Cart"
           color={Colors.primary}

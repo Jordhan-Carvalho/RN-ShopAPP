@@ -1,4 +1,9 @@
-import { ADD_CART, REMOVE_CART, ADD_ORDER } from "../actions/types";
+import {
+  ADD_CART,
+  REMOVE_CART,
+  ADD_ORDER,
+  DELETE_ITEM
+} from "../actions/types";
 
 const initialState = {
   cart: [],
@@ -65,6 +70,16 @@ const cartReducer = (state = initialState, action) => {
         totalAmount: 0,
         loading: false
       };
+    case DELETE_ITEM:
+      const prodRemoved = state.cart.find(ele => ele.id === payload);
+      if (prodRemoved) {
+        return {
+          ...state,
+          cart: state.cart.filter(prod => prod.id !== payload),
+          totalAmount: state.totalAmount - prodRemoved.sum,
+          loading: false
+        };
+      }
     default:
       return state;
   }

@@ -18,7 +18,10 @@ const Cart = ({ navigation }) => {
     <View style={styles.container}>
       <Card style={styles.summaryContainer}>
         <Text style={styles.summaryText}>
-          Total: <Text style={styles.amount}>${totalSum.toFixed(2)}</Text>
+          Total:{" "}
+          <Text style={styles.amount}>
+            ${Math.round(totalSum.toFixed(2) * 100) / 100}
+          </Text>
         </Text>
         <Button
           title="Order Now"
