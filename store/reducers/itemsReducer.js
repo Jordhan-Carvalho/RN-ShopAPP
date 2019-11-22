@@ -1,5 +1,11 @@
 import items from "../../data/items";
-import { DELETE_ITEM, CREATE_ITEM, UPDATE_ITEM } from "../actions/types";
+import {
+  DELETE_ITEM,
+  CREATE_ITEM,
+  UPDATE_ITEM,
+  GET_ITEMS,
+  ITEMS_ERROR
+} from "../actions/types";
 import { Product } from "../../data/model";
 
 const initialState = {
@@ -12,9 +18,16 @@ const initialState = {
 const itemsReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
+    case GET_ITEMS:
+      return {
+        ...state,
+        items: payload,
+        userProducts: payload.filter(prod => prod.ownerId === "u1"),
+        loading: false
+      };
     case CREATE_ITEM:
       const newProd = new Product(
-        new Date().toString(),
+        payload.id,
         "u1",
         payload.title,
         payload.imageUrl,
@@ -24,7 +37,8 @@ const itemsReducer = (state = initialState, action) => {
       return {
         ...state,
         items: [...state.items, newProd],
-        userProducts: [...state.userProducts, newProd]
+        userProducts: [...state.userProducts, newProd],
+        loading: false
       };
     case UPDATE_ITEM:
       const prodIndex = state.userProducts.findIndex(
@@ -55,13 +69,20 @@ const itemsReducer = (state = initialState, action) => {
       return {
         ...state,
         items: newItemsProd,
-        userProducts: newUserProd
+        userProducts: newUserProd,
+        loading: false
       };
     case DELETE_ITEM:
       return {
         ...state,
         userProducts: state.userProducts.filter(prod => prod.id !== payload),
         items: state.items.filter(prod => prod.id !== payload),
+        loading: false
+      };
+    case ITEMS_ERROR:
+      return {
+        ...state,
+        error: payload,
         loading: false
       };
     default:

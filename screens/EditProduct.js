@@ -5,9 +5,10 @@ import {
   ScrollView,
   Platform,
   Alert,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ActivityIndicator
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
 import Input from "../components/Input";
@@ -45,6 +46,9 @@ const formReducer = (state, action) => {
 
 const EditProducts = ({ navigation }) => {
   const prod = navigation.getParam("prod");
+  const { loading: isLoading, error } = useSelector(
+    state => state.itemsReducer
+  );
   const dispatch = useDispatch();
   // use when a lot of individual state
   const initialState = {
@@ -70,7 +74,7 @@ const EditProducts = ({ navigation }) => {
   // const [price, setPrice] = useState("");
   // const [description, setDescription] = useState(prod ? prod.description : "");
 
-  // send a function to params, useEffect auseCallback
+  // send a function to params or (dispatch), useEffect auseCallback
   const submitHandler = useCallback(() => {
     //check validations
     if (!formState.formIsValid) {
@@ -113,6 +117,20 @@ const EditProducts = ({ navigation }) => {
     },
     [dispatchReducer]
   );
+
+  if (isLoading) {
+    <View style={styles.centered}>
+      <ActivityIndicator size="large" color={Colors.primary} />
+    </View>;
+  }
+
+  if (!isLoading && error.message) {
+    return (
+      <View style={styles.centered}>
+        <Text>An error occurred, restart your app</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -201,6 +219,11 @@ EditProducts.navigationOptions = navData => {
 const styles = StyleSheet.create({
   form: {
     margin: 20
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 
