@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, { useEffect, useCallback, useReducer, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
 import Input from "../components/Input";
@@ -46,9 +46,10 @@ const formReducer = (state, action) => {
 
 const EditProducts = ({ navigation }) => {
   const prod = navigation.getParam("prod");
-  const { loading: isLoading, error } = useSelector(
-    state => state.itemsReducer
-  );
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
   const dispatch = useDispatch();
   // use when a lot of individual state
   const initialState = {
@@ -75,7 +76,7 @@ const EditProducts = ({ navigation }) => {
   // const [description, setDescription] = useState(prod ? prod.description : "");
 
   // send a function to params or (dispatch), useEffect auseCallback
-  const submitHandler = useCallback(() => {
+  const submitHandler = useCallback(async () => {
     //check validations
     if (!formState.formIsValid) {
       Alert.alert("Wrong Input", "Please check the errors in the form", [
@@ -83,24 +84,34 @@ const EditProducts = ({ navigation }) => {
       ]);
       return;
     }
+    setError(null);
+    setIsLoading(true);
 
-    if (prod) {
-      const produc = {
-        title: formState.inputValue.title,
-        imageUrl: formState.inputValue.imageUrl,
-        description: formState.inputValue.description
-      };
-      dispatch(updateItem(produc, prod.id));
-    } else {
-      const produc = {
-        title: formState.inputValue.title,
-        imageUrl: formState.inputValue.imageUrl,
-        price: parseFloat(formState.inputValue.price),
-        description: formState.inputValue.description
-      };
-      dispatch(createItem(produc));
+    try {
+      if (prod) {
+        const produc = {
+          title: formState.inputValue.title,
+          imageUrl: formState.inputValue.imageUrl,
+          description: formState.inputValue.description
+        };
+
+        await dispatch(updateItem(produc, prod.id));
+      } else {
+        const produc = {
+          title: formState.inputValue.title,
+          imageUrl: formState.inputValue.imageUrl,
+          price: parseFloat(formState.inputValue.price),
+          description: formState.inputValue.description
+        };
+        await dispatch(createItem(produc));
+      }
+      navigation.goBack();
+    } catch (error) {
+      setError(error.message);
+      Alert.alert("Error", error.message);
     }
-    navigation.goBack();
+
+    setIsLoading(false);
   }, [dispatch, prod, formState]);
 
   useEffect(() => {
@@ -119,18 +130,20 @@ const EditProducts = ({ navigation }) => {
   );
 
   if (isLoading) {
-    <View style={styles.centered}>
-      <ActivityIndicator size="large" color={Colors.primary} />
-    </View>;
-  }
-
-  if (!isLoading && error.message) {
     return (
       <View style={styles.centered}>
-        <Text>An error occurred, restart your app</Text>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
+
+  // if (!isLoading && error) {
+  //   return (
+  //     <View style={styles.centered}>
+  //       <Text>An error occurred, restart your app</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <KeyboardAvoidingView

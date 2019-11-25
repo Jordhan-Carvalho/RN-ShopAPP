@@ -1,5 +1,5 @@
 import React from "react";
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { Platform } from "react-native";
@@ -12,6 +12,7 @@ import Cart from "../screens/Cart";
 import Orders from "../screens/Orders";
 import ManageProducts from "../screens/ManageProducts";
 import EditProduct from "../screens/EditProduct";
+import LoginScreen from "../screens/LoginScreen";
 
 const defaultNavStackOptions = {
   defaultNavigationOptions: {
@@ -99,4 +100,16 @@ const MainNavDrawer = createDrawerNavigator(
   }
 );
 
-export default createAppContainer(MainNavDrawer);
+const AuthNavStack = createStackNavigator(
+  {
+    Auth: LoginScreen
+  },
+  defaultNavStackOptions
+);
+
+const MainSwitchNavigator = createSwitchNavigator({
+  Auth: AuthNavStack,
+  Main: MainNavDrawer
+});
+
+export default createAppContainer(MainSwitchNavigator);

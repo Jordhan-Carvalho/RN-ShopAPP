@@ -84,6 +84,8 @@ const MainScreen = ({ navigation }) => {
         </View>
       ) : (
         <FlatList
+          onRefresh={() => dispatch(getItems())}
+          refreshing={isLoading}
           style={{ width: "100%" }}
           keyExtractor={(item, index) => item.id}
           data={availableItems}

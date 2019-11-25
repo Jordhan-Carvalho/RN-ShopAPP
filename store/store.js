@@ -5,11 +5,13 @@ import thunk from "redux-thunk";
 import itemsReducer from "./reducers/itemsReducer";
 import cartReducer from "./reducers/cartReducer";
 import orderReducer from "./reducers/orderReducer";
+import authReducer from "./reducers/authReducer";
 
 const rootReducer = combineReducers({
   itemsReducer,
   cartReducer,
-  orderReducer
+  orderReducer,
+  authReducer
 });
 
 const store = createStore(

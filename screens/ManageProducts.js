@@ -1,5 +1,14 @@
-import React from "react";
-import { StyleSheet, FlatList, Platform, Button, Alert } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  FlatList,
+  View,
+  Platform,
+  Button,
+  Alert,
+  ActivityIndicator,
+  Text
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
@@ -10,18 +19,49 @@ import { deleteItem } from "../store/actions/items";
 
 const ManageProducts = ({ navigation }) => {
   const userProducts = useSelector(state => state.itemsReducer.userProducts);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
   const dispatch = useDispatch();
 
   const deleteHanlder = id => {
+    const newDispatch = async id => {
+      setIsLoading(true);
+      try {
+        await dispatch(deleteItem(id));
+      } catch (error) {
+        setError(error.message);
+        Alert.alert("Error", error.message);
+      }
+      setIsLoading(false);
+    };
+
     Alert.alert("Are you sure?", "Deleting can not be reversed", [
       {
         text: "Yes",
-        onPress: () => dispatch(deleteItem(id)),
+        onPress: () => newDispatch(id),
         style: "destructive"
       },
       { text: "No", style: "cancel" }
     ]);
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (userProducts.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text>You have no registered products</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -81,6 +121,12 @@ ManageProducts.navigationOptions = navData => {
   };
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  }
+});
 
 export default ManageProducts;

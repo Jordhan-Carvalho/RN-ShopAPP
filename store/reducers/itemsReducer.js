@@ -1,4 +1,3 @@
-import items from "../../data/items";
 import {
   DELETE_ITEM,
   CREATE_ITEM,
@@ -9,8 +8,8 @@ import {
 import { Product } from "../../data/model";
 
 const initialState = {
-  items,
-  userProducts: items.filter(prod => prod.ownerId === "u1"),
+  items: [],
+  userProducts: [],
   loading: true,
   error: {}
 };
@@ -21,14 +20,14 @@ const itemsReducer = (state = initialState, action) => {
     case GET_ITEMS:
       return {
         ...state,
-        items: payload,
-        userProducts: payload.filter(prod => prod.ownerId === "u1"),
+        items: payload.prodArray,
+        userProducts: payload.userProducts,
         loading: false
       };
     case CREATE_ITEM:
       const newProd = new Product(
         payload.id,
-        "u1",
+        payload.ownerId,
         payload.title,
         payload.imageUrl,
         payload.description,

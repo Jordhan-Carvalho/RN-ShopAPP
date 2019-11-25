@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  FlatList,
+  ActivityIndicator,
+  Alert
+} from "react-native";
 import { useDispatch } from "react-redux";
 
 import { addOrder } from "../store/actions/orders";
@@ -8,11 +16,23 @@ import CartItem from "../components/CartItem";
 import Card from "../components/Card";
 import Colors from "../constants/Colors";
 
-const Cart = ({ navigation }) => {
+const Cart = () => {
   const itemsCart = useSelector(state => state.cartReducer.cart);
   const totalSum = useSelector(state => state.cartReducer.totalAmount);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
+
+  const sendOrder = async () => {
+    setIsLoading(true);
+    try {
+      await dispatch(addOrder(itemsCart, totalSum));
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -23,12 +43,16 @@ const Cart = ({ navigation }) => {
             ${Math.round(totalSum.toFixed(2) * 100) / 100}
           </Text>
         </Text>
-        <Button
-          title="Order Now"
-          color={Colors.secondary}
-          disabled={itemsCart.length === 0}
-          onPress={() => dispatch(addOrder(itemsCart, totalSum))}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Button
+            title="Order Now"
+            color={Colors.secondary}
+            disabled={itemsCart.length === 0}
+            onPress={sendOrder}
+          />
+        )}
       </Card>
       <FlatList
         keyExtractor={item => item.id}
@@ -59,6 +83,11 @@ const styles = StyleSheet.create({
   },
   amount: {
     color: Colors.primary
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 
