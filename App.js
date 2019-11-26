@@ -3,7 +3,7 @@ import { useScreens } from "react-native-screens";
 import * as Font from "expo-font";
 import { AppLoading } from "expo";
 
-import MainNav from "./navigation/MainNav";
+import NavigationContainer from "./navigation/NavigationContainer";
 
 //redux
 import store from "./store/store";
@@ -32,7 +32,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <MainNav />
+      <NavigationContainer />
     </Provider>
   );
 }

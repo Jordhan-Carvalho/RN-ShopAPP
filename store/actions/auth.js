@@ -1,4 +1,36 @@
-import { SIGNUP, SIGNIN } from "./types";
+import { AsyncStorage } from "react-native";
+
+import { SIGNUP, SIGNIN, AUTHENTICATE, LOGOUT } from "./types";
+
+let timer;
+
+const saveDataToStorage = (token, userId, expirationDate) => {
+  AsyncStorage.setItem(
+    "userData",
+    JSON.stringify({
+      token,
+      userId,
+      expireDate: expirationDate.toISOString()
+    })
+  );
+};
+
+const clearLogoutTimer = () => {
+  if (timer) {
+    clearTimeout(timer);
+  }
+};
+
+const setLogoutTimer = expirationTime => async dispatch => {
+  timer = setTimeout(() => {
+    dispatch(logout());
+  }, expirationTime);
+};
+
+export const authenticate = (userId, token, expiryTime) => dispatch => {
+  dispatch(setLogoutTimer(expiryTime));
+  dispatch({ type: AUTHENTICATE, payload: { userId, token } });
+};
 
 export const signup = (email, password) => async dispatch => {
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=
@@ -39,10 +71,14 @@ export const signup = (email, password) => async dispatch => {
 
   const data = await res.json();
 
-  dispatch({
-    type: SIGNUP,
-    payload: { token: data.idToken, userId: data.localId }
-  });
+  dispatch(
+    authenticate(data.localId, data.idToken, parseInt(data.expiresIn) * 1000)
+  );
+
+  const expirationDate = new Date(
+    new Date().getTime() + parseInt(data.expiresIn) * 1000
+  );
+  saveDataToStorage(data.idToken, data.localId, expirationDate);
 };
 
 export const signIn = (email, password) => async dispatch => {
@@ -83,8 +119,18 @@ export const signIn = (email, password) => async dispatch => {
 
   const data = await res.json();
 
-  dispatch({
-    type: SIGNIN,
-    payload: { token: data.idToken, userId: data.localId }
-  });
+  dispatch(
+    authenticate(data.localId, data.idToken, parseInt(data.expiresIn) * 1000)
+  );
+
+  const expirationDate = new Date(
+    new Date().getTime() + parseInt(data.expiresIn) * 1000
+  );
+  saveDataToStorage(data.idToken, data.localId, expirationDate);
+};
+
+export const logout = () => {
+  clearLogoutTimer();
+  AsyncStorage.removeItem("userData");
+  return { type: LOGOUT };
 };

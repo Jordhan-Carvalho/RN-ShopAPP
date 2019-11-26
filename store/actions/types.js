@@ -12,3 +12,5 @@ export const ITEMS_ERROR = "ITEMS_ERROR";
 
 export const SIGNUP = "SIGNUP";
 export const SIGNIN = "SIGNIN";
+export const AUTHENTICATE = "AUTHENTICATE";
+export const LOGOUT = "LOGOUT";

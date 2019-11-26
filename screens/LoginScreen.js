@@ -88,6 +88,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       if (isSignup) {
         await dispatch(signup(email, password));
+        navigation.navigate("Main");
       } else {
         await dispatch(signIn(email, password));
         navigation.navigate("Main");

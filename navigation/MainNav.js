@@ -1,9 +1,10 @@
 import React from "react";
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import { createDrawerNavigator } from "react-navigation-drawer";
-import { Platform } from "react-native";
+import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
+import { Platform, SafeAreaView, Button, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
 
 import Colors from "../constants/Colors";
 import MainScreen from "../screens/MainScreen";
@@ -13,6 +14,8 @@ import Orders from "../screens/Orders";
 import ManageProducts from "../screens/ManageProducts";
 import EditProduct from "../screens/EditProduct";
 import LoginScreen from "../screens/LoginScreen";
+import StartupScreen from "../screens/StartupScreen";
+import { logout } from "../store/actions/auth";
 
 const defaultNavStackOptions = {
   defaultNavigationOptions: {
@@ -96,7 +99,26 @@ const MainNavDrawer = createDrawerNavigator(
       //   labelStyle: { fontFamily: "odibee-sans", color: "white" }
     },
     drawerBackgroundColor: Colors.primary,
-    drawerWidth: "50%"
+    drawerWidth: "50%",
+    //add more buttons / react comp => can be created in another flder
+    contentComponent: props => {
+      const dispatch = useDispatch();
+      return (
+        <View style={{ flex: 1, padding: 20 }}>
+          <SafeAreaView forceInset={{ top: "always", horizontal: "never" }}>
+            <DrawerItems {...props} />
+            <Button
+              title="Logout"
+              color={Colors.primary}
+              onPress={() => {
+                dispatch(logout());
+                props.navigation.navigate("Auth");
+              }}
+            />
+          </SafeAreaView>
+        </View>
+      );
+    }
   }
 );
 
@@ -108,6 +130,7 @@ const AuthNavStack = createStackNavigator(
 );
 
 const MainSwitchNavigator = createSwitchNavigator({
+  Startup: StartupScreen,
   Auth: AuthNavStack,
   Main: MainNavDrawer
 });
